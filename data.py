@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch.utils.data.dataset import Dataset
 
@@ -31,7 +32,17 @@ class RawReplace7Dataset(Dataset):
 class LSTMDataset(RawReplace7Dataset):
     def __init__(self, dataset_path):
         super(LSTMDataset, self).__init__(dataset_path)
+        self.word2index = np.load('word2index.npy', allow_pickle=True).item()
+    
+    def __getitem__(self, index):
 
+        indexs = [self.word2index[x] for x in self.rpl_poets[index]]
+        encoding = torch.zeros((len(indexs), len(self.word2index.items())))
+        for i in range(len(indexs)):
+            encoding[i, indexs[i]] = 1
+        
+        return encoding, self.rpl_idxs[index]
+        
 
 if __name__ == '__main__':
     dataset_path = 'dataset/replace7/replace_poems_7.txt'
