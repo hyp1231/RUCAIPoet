@@ -13,14 +13,19 @@ class FineTune(nn.Module):
     def __init__(self,model):
         super(FineTune, self).__init__()
         self.model = model
-        self.fc = nn.Linear(768, 1)
+        self.fc1 = nn.Linear(768, 200)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(200, 1)
         self.sigmoid = nn.Sigmoid()
+        for param in model.parameters():
+            param.requires_grad = False
 
     def forward(self, x):
         output = model(x).last_hidden_state
         output = output[:, 0, :]
-        x = self.fc(output)
-
+        x = self.fc1(output)
+        x = self.relu(x)
+        x = self.fc2(x)
         x = self.sigmoid(x)
         return x.squeeze()
 
@@ -50,11 +55,12 @@ def fine_tune():
     test_loader = DataLoader(dataset=test_data,
                             batch_size=8192,
                             shuffle=False)
-    finetune = FineTune(model)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    finetune = FineTune(model).to(device)
     loss = nn.BCELoss()
-    optimizer = torch.optim.Adam(finetune.parameters(), lr=0.005)
+    optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, finetune.parameters()), lr=0.0001)
 
-    for epoch in range(5):
+    for epoch in range(10):
         train_loss = 0
         for i, data in enumerate(train_loader):
             # 将数据从 train_loader 中读出来,一次读取的样本数是32个
@@ -67,6 +73,7 @@ def fine_tune():
             l.backward()
             optimizer.step()
             train_loss += l.item()
+            #print(train_loss)
         dev_acc = evaluate_accuracy(dev_loader, finetune)
         print('epoch %d ,loss %.4f' % (epoch + 1, train_loss) + ', dev acc {:.2f}%'.format(dev_acc * 100))
     test_acc = evaluate_accuracy(test_loader, finetune)
