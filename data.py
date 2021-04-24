@@ -58,18 +58,28 @@ class NextDataset(Dataset):
         return self.flags.shape[0]
     
 class LSTMDataset(RawReplace7Dataset):
-    def __init__(self, dataset_path):
-        super(LSTMDataset, self).__init__(dataset_path)
-        self.word2index = np.load('word2index.npy', allow_pickle=True).item()
-    
-    def __getitem__(self, index):
+    def __init__(self, dataset_path, mode):
+        super(LSTMDataset, self).__init__(f'{dataset_path}.{mode}')
 
-        indexs = [self.word2index[x] for x in self.rpl_poets[index]]
-        encoding = torch.zeros((len(indexs), len(self.word2index.items())))
-        for i in range(len(indexs)):
-            encoding[i, indexs[i]] = 1
-        
-        return encoding, self.rpl_idxs[index]
+        self.word2index = np.load('word2index.npy', allow_pickle=True).item()
+        self.rpl_poet_idxs = torch.zeros([len(self.rpl_poets), 16], dtype=torch.long)
+        for i, rpl_poet in enumerate(self.rpl_poets):
+            for j, wd in enumerate(rpl_poet):
+                self.rpl_poet_idxs[i, j] = self.word2index[wd]
+        print(mode, 'dataset', self.rpl_poet_idxs.shape, self.rpl_idxs.shape)
+
+        ans2idx = {}
+        with open('dataset/replace7/word.txt', 'r', encoding='utf-8') as file:
+            for i, line in enumerate(file):
+                line = line.strip()
+                if len(line) > 0:
+                    ans2idx[line] = i
+        self.ans_idxs = torch.zeros(len(self.rpl_poets), dtype=torch.long)
+        for i, ori_poet in enumerate(self.ori_poets):
+            self.ans_idxs[i] = ans2idx[ori_poet[self.rpl_idxs[i].item()]]
+
+    def __getitem__(self, index):
+        return self.rpl_poet_idxs[index], self.rpl_idxs[index], self.ans_idxs[index]
 
 
 class NextSeq7Dataset(Dataset):
@@ -106,6 +116,6 @@ class NextSeq7Dataset(Dataset):
         return self.labels.shape[0]
 
 if __name__ == '__main__':
-    dataset_path = 'dataset/replace7/replace_poems_7.txt'
-    dataset = RawReplace7Dataset(dataset_path)
+    dataset_path = 'dataset/replace7/replace_poems_7'
+    dataset = LSTMDataset(dataset_path, 'train')
     print(dataset[0])
