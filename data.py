@@ -94,9 +94,10 @@ class NextSeq7Dataset(Dataset):
                     continue
                 poets.append(poet)
                 labels.append(label)
-        self.poets = torch.cat(poets,dim=0)
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.poets = torch.cat(poets, dim=0).to(device)
 
-        self.labels = torch.LongTensor(labels)
+        self.labels = torch.LongTensor(labels).to(device)
 
     def __getitem__(self, index):
         return self.poets[index], self.labels[index]
