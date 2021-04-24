@@ -24,6 +24,15 @@ class RawReplace7Dataset(Dataset):
     def __getitem__(self, index):
         return self.rpl_poets[index], self.ori_poets[index], self.rpl_idxs[index]
 
+    def __len__(self):
+        return self.rpl_idxs.shape[0]
+
+
+class LSTMDataset(RawReplace7Dataset):
+    def __init__(self, dataset_path):
+        super(LSTMDataset, self).__init__(dataset_path)
+
+
 if __name__ == '__main__':
     dataset_path = 'dataset/replace7/replace_poems_7.txt'
     dataset = RawReplace7Dataset(dataset_path)
