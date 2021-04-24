@@ -70,7 +70,39 @@ class LSTMDataset(RawReplace7Dataset):
             encoding[i, indexs[i]] = 1
         
         return encoding, self.rpl_idxs[index]
-        
+
+
+class NextSeq7Dataset(Dataset):
+
+    def __init__(self, dataset_path,tokenizer):
+
+        self.tokenizer = tokenizer
+        self._load_data(dataset_path)
+
+    def _load_data(self, dataset_path):
+        poets = []
+        labels = []
+        with open(dataset_path, 'r', encoding='utf-8') as file:
+            for line in file:
+                poet, label = line.strip().split(' ')
+                label = int(label)
+
+                poet = self.tokenizer.encode(poet, return_tensors="pt")
+                #print(poet.shape)
+                if poet.shape[1] != 18:
+                    #print(poet)
+                    continue
+                poets.append(poet)
+                labels.append(label)
+        self.poets = torch.cat(poets,dim=0)
+
+        self.labels = torch.LongTensor(labels)
+
+    def __getitem__(self, index):
+        return self.poets[index], self.labels[index]
+
+    def __len__(self):
+        return self.labels.shape[0]
 
 if __name__ == '__main__':
     dataset_path = 'dataset/replace7/replace_poems_7.txt'
