@@ -28,7 +28,35 @@ class RawReplace7Dataset(Dataset):
     def __len__(self):
         return self.rpl_idxs.shape[0]
 
+class NextDataset(Dataset):
+    def __init__(self, dataset_path):
+        self._load_data(dataset_path)
+        self.word2index = np.load('word2index.npy', allow_pickle=True).item()
+        
+    def _load_data(self, dataset_path):
+        poets = []
+        flags = []
+        with open(dataset_path, 'r', encoding='utf-8') as file:
+            for line in file:
+                poet, flag = line.strip().split(' ')
+                flag = int(flag)
+                poets.append(poet)
+                flags.append(flag)
+        self.poets = poets
+        self.flags = torch.LongTensor(flags)
 
+    def __getitem__(self, index):
+        
+        indexs = [self.word2index[x] for x in self.poets[index]]
+        encoding = torch.zeros((len(indexs), len(self.word2index.items())))
+        for i in range(len(indexs)):
+            encoding[i, indexs[i]] = 1
+        
+        return encoding, self.flags[index]
+
+    def __len__(self):
+        return self.flags.shape[0]
+    
 class LSTMDataset(RawReplace7Dataset):
     def __init__(self, dataset_path):
         super(LSTMDataset, self).__init__(dataset_path)
