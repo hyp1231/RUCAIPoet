@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>RUCAIPoet</title>
+    <!-- import CSS -->
+    <link rel="stylesheet" href="(( url_for('static', filename='css/element-ui.css') ))">
+    <link rel="stylesheet" type="text/css" href="(( url_for('static', filename='css/index.css') ))">
+  </head>
+  <body>
+    <div id="main">
+      <el-row :gutter="20">
+        <el-col :span="6" :offset="9">
+          <el-image src="(( url_for('static', filename='logo.png') ))" fit="contain"></el-image>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="12" :offset="6">
+          <el-container>
+            <el-header>
+              <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+                <el-menu-item index="1"><a href="./" target="_blank">古诗批改</a></el-menu-item>
+              </el-menu>
+            </el-header>
+            <el-main>
+              <el-form ref="form" :model="form" label-width="120px">
+                <el-form-item label="批改前古诗">
+                  <el-input
+                    v-model="form.input"
+                    placeholder="请输入内容"
+                    type="textarea"
+                    rows="5">
+                  </el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="onSubmit" icon="el-icon-s-promotion">修改</el-button>
+                </el-form-item>
+                <el-form-item label="AI批改古诗">
+                  <el-input
+                    v-model="output"
+                    type="textarea"
+                    rows="5"
+                    :readonly=true>
+                  </el-input>
+                </el-form-item>
+              </el-form>
+            </el-main>
+            <el-footer>
+              <el-divider></el-divider>
+              <span>Copyright © 2021 &nbsp; <i class="el-icon-sunny"></i> &nbsp; NLP @ GSAI &nbsp; <i class="el-icon-sunny"></i> &nbsp; 刘浩宇 林子涵 侯宇蓬</span>
+            </el-footer>
+          </el-container>
+        </el-col>
+      </el-row>
+    </div>
+  </body>
+  <!-- import Vue before Element -->
+  <script src="(( url_for('static', filename='js/vue.js') ))"></script>
+  <script src="(( url_for('static', filename='js/vue-resource.js') ))"></script>
+  <!-- import JavaScript -->
+  <script src="(( url_for('static', filename='js/element-ui.js') ))"></script>
+  <script src="(( url_for('static', filename='js/index.js') ))"></script>
+</html>
