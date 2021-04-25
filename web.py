@@ -1,6 +1,6 @@
 import json
 from flask import Flask, render_template, request
-from demo import api
+from multi_wd import api
 
 
 class CustomFlask(Flask):
@@ -26,7 +26,7 @@ def main():
 def input_poet():
     input_poet = request.form['input']
     print(input_poet, flush=True)
-    output_poet = api(input_poet)
+    output_poet = api(input_poet, 10)
     return json.dumps({'output': output_poet})
 
 app.run(host='0.0.0.0', port=8848, debug=True)
