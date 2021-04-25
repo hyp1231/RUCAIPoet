@@ -13,12 +13,12 @@ args.lr = 3e-4
 args.decay = 0.
 args.batch_size = 256
 args.num_workers = 0
-args.dataset_path = 'dataset/replace7/replace_poems_7'
+args.dataset_path = 'dataset/rpl_all/replace_poems_all'
 
-args.word_num = 6361
+args.word_num = 6357
 args.hd_size = 200
 args.pos = 16
-args.wd_ans = 30
+args.wd_ans = 6357
 args.alpha = 1.
 
 
